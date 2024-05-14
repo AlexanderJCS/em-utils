@@ -107,5 +107,5 @@ def run(files_to_process, crop, adjust_brightness, output_dir, out_label: tk.Lab
         
         file.pil_img.save(os.path.join(output_dir, f"{filename}.tif"))
     
-    out_label.config(text="Done!")
+    out_label.config(text=f"Processed {len(files_to_process)} images")
     
