@@ -1,3 +1,5 @@
+# Code created by Alexander Castronovo for MPFI's EM Core, 2024
+
 import tkinter as tk
 from tkinter import filedialog
 from dataclasses import dataclass
