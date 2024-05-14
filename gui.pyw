@@ -10,9 +10,17 @@ FONT_BIG = ("Helvetica", 14)
 FONT_NORMAL = ("Helvetica", 12)
 
 
-def run(input_path: str, output_path: str, crop: bool, adjust_brightness: bool, recursive: bool, output_text: tk.Label):
-    all_files = files.get_all_images(input_path, recursive)
-    logic.run(all_files, crop, adjust_brightness, output_path)
+def run(input_path: str, output_path: str, crop: bool, adjust_brightness: bool, recursive: bool, out_label: tk.Label):
+    try:
+        all_files = files.get_all_images(input_path, recursive)
+    except FileNotFoundError:
+        out_label.config(text="Image folder does not exist!")
+        return
+    
+    try:
+        logic.run(all_files, crop, adjust_brightness, output_path, out_label)
+    except FileNotFoundError:
+        out_label.config(text="Output folder does not exist!")
 
 
 def main():

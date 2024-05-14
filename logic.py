@@ -1,3 +1,5 @@
+import tkinter as tk
+
 from PIL.Image import Image
 from PIL.Image import fromarray
 
@@ -81,7 +83,7 @@ def adjust_luminosity(image: Image, current_luminosity: float, target_luminosity
     return fromarray(img_array)  # Image.fromarray
 
 
-def run(files_to_process, crop, adjust_brightness, output_dir):
+def run(files_to_process, crop, adjust_brightness, output_dir, out_label: tk.Label):
     if crop:
         for file in files_to_process:
             file.pil_img = crop_image(file.pil_img)
@@ -102,4 +104,6 @@ def run(files_to_process, crop, adjust_brightness, output_dir):
         filename += "_adjustbrightness" if adjust_brightness else ""
         
         file.pil_img.save(os.path.join(output_dir, f"{filename}.tif"))
+    
+    out_label.config(text="Done!")
     
