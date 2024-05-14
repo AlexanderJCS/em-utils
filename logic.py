@@ -42,13 +42,13 @@ def crop_image(image: Image) -> Image:
     return image  # bad! no black bar found
 
 
-def avg_luminosity(images: list[Image]) -> float:
+def avg_luminosity(images: list[Image]) -> tuple[float, list[float]]:
     """
     Returns the average luminosity of the given images. Does not include pixels that are below 0.2 brightness, since
     those are likely to be stuff in the image or black bars. It also does not include pixels that equal 255.
     
     :param images: The images to process.
-    :return: The average luminosity of the images. Range: 0-255 inclusive
+    :return: The average luminosity of the images, a list of the luminosities of each image.
     """
     
     img_arrays = [np.array(image).flatten() for image in images]
@@ -57,16 +57,17 @@ def avg_luminosity(images: list[Image]) -> float:
     for i, img_array in enumerate(img_arrays):
         img_arrays[i] = img_array[(img_array > 0.2) & (img_array < 255)]
     
-    all_thresholded_pixels = np.concatenate(img_arrays)
+    img_means: list[float] = [np.mean(img_array) for img_array in img_arrays]
     
-    return np.mean(all_thresholded_pixels)
+    return np.mean(img_means), img_means
 
 
-def adjust_luminosity(image: Image, target_luminosity: float) -> Image:
+def adjust_luminosity(image: Image, current_luminosity: float, target_luminosity: float) -> Image:
     """
     Adjusts the luminosity of the given image to the target luminosity.
     
     :param image: The image to adjust.
+    :param current_luminosity: The current luminosity of the image.
     :param target_luminosity: The target luminosity to adjust the image to.
     :return: The adjusted image.
     """
@@ -74,7 +75,7 @@ def adjust_luminosity(image: Image, target_luminosity: float) -> Image:
     img_array = np.array(image)
     
     # adjust the luminosity
-    img_array = img_array * (target_luminosity / avg_luminosity([image]))
+    img_array = img_array * (target_luminosity / current_luminosity)
     img_array = img_array.astype(np.uint8)
     
     return fromarray(img_array)  # Image.fromarray
@@ -86,10 +87,14 @@ def run(files_to_process, crop, adjust_brightness, output_dir):
             file.pil_img = crop_image(file.pil_img)
     
     if adjust_brightness:
-        avg_lum = avg_luminosity([file.pil_img for file in files_to_process])
+        target_lum, img_means = avg_luminosity([file.pil_img for file in files_to_process])
         
-        for file in files_to_process:
-            file.pil_img = adjust_luminosity(file.pil_img, avg_lum)
+        for i, file in enumerate(files_to_process):
+            # we can find the image mean in img_means using the same index since the order of the images in the list
+            # is the same as the order of the images in files_to_process
+            current_lum = img_means[i]
+            
+            file.pil_img = adjust_luminosity(file.pil_img, current_lum, target_lum)
     
     for file in files_to_process:
         filename = file.img_name.split(".")[0]
