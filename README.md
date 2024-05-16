@@ -12,7 +12,9 @@ A small program created to help reduce the busywork involving EM images. This pr
 ### Installation
 1. On the top of this page, click Code -> Download ZIP
 2. Extract the ZIP file and open the extracted folder
-3. Run `gui.pyw` with Python (ensure the correct version is being used)
+3. Open a terminal in the extracted folder
+4. Run `py -m pip install -r requirements.txt` to install dependencies
+5. Run `gui.pyw` with Python (ensure the correct version is being used)
 
 ## Usage
 
